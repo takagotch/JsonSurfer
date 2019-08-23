@@ -100,6 +100,26 @@ public static void main(String[] s) throws Exception {
   toStream(json, "$[*]").mapToDouble(o -> ((LongNode) o).asDoulbe()).averate().ifPresent(System.out::println);
 }
 
+Vertx vertx = Vertex.vertx();
+HttpServer server = vertx.createHttpServer(new HttpServerOptions());
+JsonSurfer surfer = JsonSurferJackson.INSTANCE;
+SurfingConfiguration config = surferBuilder()
+  .bind("$[*]", (JsonPathListener) (value, context) -> {
+    System.out.println(value);
+  }).build();
+server.requestHandler(request -> {
+  NonBlockingParser parser = surfer.createNonBlockingParser(config);
+  request.handler(buffer -> {
+    byte[] bytes = buffer.getBytes();
+    System.out.println("Received " + bytes.length + " bytes");
+    parser.feed(bytes, 0, bytes.length);
+  });
+  request.endHandler(aVoid -> {
+    parser.endOfInput();
+    System.out.println("End of request");
+    request.response().end();
+  });
+}).listen(8080);
 
 
 
