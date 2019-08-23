@@ -121,7 +121,35 @@ server.requestHandler(request -> {
   });
 }).listen(8080);
 
+JsonSurfer surfer = JsonSurferGson.INSTANCE;
+surfer.configBuilder()
+  .bind("$.store.book[*].author", new JsonPathListener() {
+    @Override
+    public void onValue(Object value, ParsingContext context) {
+      System.out.println(value);
+    }
+  })
+  .buildAndSurf(sample);
 
+JsonSurfer surfer = JsonSurferGson.INSTANCE;
+surfer.configBuilder()
+  .bind("$.store.*", new JsonPathListener() {
+    @Override
+    public void onValue(Object value, ParsingContext context) {
+      System.out.println(value);
+    }
+  })
+  .buildAndSurf(sample);
+
+JsonSurfer surfer = JsonSurferGson.INSTANCE;
+surfer.configBuilder()
+  .bind("$.store..price", new JsonPathListener() {
+    @Override
+    public void onValue(Object value, ParsingContext context) {
+      System.out.println(value);
+    }
+  })
+  .buildAndSurf(sample);
 
 
 ```
